@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+
+     
+   <div class="container my-5">
+        <div class="card mb-3">
+            <div class="row g-0">
+            <div class="col-md-4">
+                <img src="{{ product.image.url }}" class="img-fluid rounded-start" alt="...">
+            </div>
+            <div class="col-md-8">
+                <center>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.title }}</h5>
+                        <p class="card-text">{{product.description}}</p>
+                        <p class="card-text"><small class="text-body-secondary">Last updated {{ product.update }}</small></p>
+
+                        {% if product.is_sale %}
+                            <div class="d-flex justify-content-center small text-warning mb-2">
+                                <div class="bi-star-fill"></div>
+                                &nbsp;&nbsp;sale!&nbsp;&nbsp;
+                                <div class="bi-star-fill"></div>
+                            </div>
+                        {% else %}
+                            ${{product.price}}    
+
+                            <br /> ID: {{product.id}}
+                        {% endif %}
+                        <br/><br/>
+                        <br/><br/>
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Home</a>
+                        <button id="add-cart" data-product-id="{{ product.id }}" class="btn btn-primary">
+                            Add to Cart
+                        </button>
+                        
+                    </div>
+                </center>
+            </div>
+            </div>
+        </div>
+   </div>
+<script>
+    // Check if button is clicked
+    $(document).on('click', '#add-cart', function(e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'cart_add' %}",  // Fixed Django template tag
+            data: {
+                product_id: $(this).data('product-id'),  // Get product ID from data attribute
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post'
+            },
+            success: function(json) {
+                console.log("Added to cart successfully!");
+            },
+            error: function(xhr, errmsg, err) {
+                console.error("Error adding to cart:", xhr.status, xhr.statusText, errmsg, err);
+                console.error("Response Text:", xhr.responseText);
+
+            }
+        });
+    });
+</script>
+{% endblock%}
